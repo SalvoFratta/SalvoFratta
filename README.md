@@ -19,20 +19,25 @@ The four analyzed models, as referenced in the paper, are:
 ## Project Structure
 ```plaintext
 index_tracking_project/
-├── README.md                          # Documentazione del progetto
-├── requirements.txt                    # Dipendenze del progetto
-├── main.py                              # Script principale
-├── A_constrained_cluster_based_approach_for_tracking_the_S&P_500_index.pdf  # Paper di riferimento
-├── data/                                # Cartella dei dati 
-│   ├── market_caps_df_1.csv             # Dati sulle capitalizzazioni di mercato 
-│   ├── market_caps_df_2.csv             # Dati sulle capitalizzazioni di mercato
-│   ├── data_stocks_filtered.pkl         # Dati sui titoli
-│   ├── sp500_companies.csv              # Lista delle aziende S&P 500
-├── solver/                              # Moduli per l'ottimizzazione
-│   ├── __init__.py                      # Permette di trattare la cartella come un modulo Python
-│   ├── tracking_portfolio_models.py     # Modelli per il tracking dell’indice
-│   ├── utility_functions.py             # Funzioni di supporto
-│   └── plot_functions.py                # Funzioni di visualizzazione dei risultati
+├── README.md                          
+├── requirements.txt                    
+├── main.py                              
+├── A_constrained_cluster_based_approach_for_tracking_the_S&P_500_index.pdf 
+├── data/                                
+│   ├── market_caps_df_2020.csv           
+│   ├── market_caps_df_2021.csv          
+│   ├── data_stocks_filtered.pkl         
+│   ├── sp500_companies.csv              
+    ├── market_caps_dict.pkl 
+    ├── results_model_1_roll.pkl 
+    ├── results_model_2_roll.pkl 
+    ├── results_model_3_roll.pkl 
+    ├── results_model_4_roll.pkl               
+├── solver/                              
+│   ├── __init__.py                      
+│   ├── tracking_portfolio_models.py     
+│   ├── utility_functions.py             
+│   └── plot_functions.py                
 
 ```
 ## Requirements
@@ -46,6 +51,7 @@ To correctly run the project, ensure that the following dependencies are install
 -**io**
 -**PIL**
 -**copy**
+-**itertools**
 
 The Python version used is 3.8.8.
 Additionally, an active license is required for the Gurobi extension.
@@ -56,7 +62,7 @@ Additionally, an active license is required for the Gurobi extension.
 The required input data is saved in the **data** folder and is directly imported into the main.py file.
 Therefore, to run the project, simply execute the main file: main.py
 
-Approximate computation time to run the entire code on a PC with 8GB RAM and **gurobipy==11.0.3** is about **35 minutes**.
+Approximate computation time to run the entire code on a PC with 8GB RAM and **gurobipy==11.0.3** is about **80 minutes**.
 
 If you wish to execute the 4 models for only a few values of the portfolio size, reduce the list of values q_values in the initial parameters of the main.py file.
 
