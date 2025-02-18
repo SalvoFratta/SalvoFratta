@@ -8,3 +8,4 @@ io
 PIL
 copy
 itertools
+pathlib

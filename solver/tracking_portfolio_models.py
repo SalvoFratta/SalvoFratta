@@ -103,7 +103,7 @@ def transaction_cost_tracking(rho, market_caps_df, w0, q, alpha=0.001, gamma=0.0
     """
     Solves a mixed-integer linear optimization problem (MODEL 2 - eq. (2-2.1)-(2-2.3)): 
     Selects a tracking portfolio with constraints on the number of stocks (q), 
-    representative constraints for each stock in its cluster, weight limits, and transaction costs.
+    representative constraints for each stock in its cluster, weight limits and transaction costs.
 
     Input:
     - rho: DataFrame of stock correlations.
@@ -459,8 +459,8 @@ def full_constrained_tracking(sector_counts, sector_correlation_matrices, market
         # (4-1.7) Turnover
         for sector in n_k.keys():
             for j in range(n_k[sector]):
-                model.addConstr(z[j, sector] >= w0.get(j, 0) - w[j, sector])
-                model.addConstr(z[j, sector] >= w[j, sector] - w0.get(j, 0))
+                model.addConstr(z[j, sector] >= w0.get(market_caps_df.index[j],0) - w[j, sector]) 
+                model.addConstr(z[j, sector] >= w[j, sector] - w0.get(market_caps_df.index[j],0))
 
         # Optimization
         model.optimize()

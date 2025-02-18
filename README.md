@@ -38,10 +38,13 @@ index_tracking_project/
 │   ├── tracking_portfolio_models.py     
 │   ├── utility_functions.py             
 │   └── plot_functions.py                
+├── results/                              
+│           
 
 ```
 ## Requirements
 To correctly run the project, ensure that the following dependencies are installed:
+```plaintext
 -**gurobipy==11.0.3**
 -**matplotlib==3.5.1**
 -**numpy==1.20.3**
@@ -52,7 +55,8 @@ To correctly run the project, ensure that the following dependencies are install
 -**PIL**
 -**copy**
 -**itertools**
-
+-**pathlib**
+```
 The Python version used is 3.8.8.
 Additionally, an active license is required for the Gurobi extension.
 

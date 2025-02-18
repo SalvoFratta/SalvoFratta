@@ -5,8 +5,7 @@ import numpy as np
 from PIL import Image
 
 
-
-def plot_norm_differences(q_values, results_model_1, results_model_2, results_model_3, results_model_4, save_figures, output_filename="norm_q_interval_1.png"):
+def plot_norm_differences(q_values, results_model_1, results_model_2, results_model_3, results_model_4, save_figures, results_path):
     """
     Function to plot a graph of the norm differences for each model as q varies.
 
@@ -15,8 +14,9 @@ def plot_norm_differences(q_values, results_model_1, results_model_2, results_mo
         - results_model_1, results_model_2, results_model_3, results_model_4 (dict): Dictionaries containing norm differences for the respective indices.
         - output_filename (str): File name for saving the graph image.
         - save_figures (bool): If True, saves the plots as image files.
+        - results_path: Path to save the figure
     """
-
+    
     plt.figure(figsize=(10, 6))
 
     # Plot lines for each model
@@ -39,8 +39,8 @@ def plot_norm_differences(q_values, results_model_1, results_model_2, results_mo
 
     # Save the figure
     if save_figures:
-        plt.savefig(output_filename)
-        print(f"Graph saved as: {output_filename}")
+        plt.savefig(results_path / "norm_differences_q.png")
+        print("Graph saved as norm_differences_q")
 
     # Display the graph
     plt.show()
@@ -49,7 +49,7 @@ def plot_norm_differences(q_values, results_model_1, results_model_2, results_mo
 
 
 
-def analyze_sector_proportions(values, sp500_companies, results_model_1, results_model_2, results_model_3, results_model_4, unique_sectors_sorted, save_figures):
+def analyze_sector_proportions(values, sp500_companies, results_model_1, results_model_2, results_model_3, results_model_4, unique_sectors_sorted, save_figures, results_path):
     """
     Function to calculate the proportion of portfolio weights in each sector. For each model and each value of q, 
     the weight distribution of the selected stocks for each sector is computed.
@@ -60,6 +60,7 @@ def analyze_sector_proportions(values, sp500_companies, results_model_1, results
         - results_model_1, results_model_2, results_model_3, results_model_4: dictionaries with the model results
         - unique_sectors_sorted: unique and sorted sectors
         - save_figures (bool): If True, saves the plots as image files.
+        - results_path: Path to save the figure
     
     Output:
         - combined_results: results of the proportion calculations as q varies
@@ -147,8 +148,8 @@ def analyze_sector_proportions(values, sp500_companies, results_model_1, results
 
         # Save the figure
         if save_figures:
-            filename = f"prop_sector_q{q}_1.png"
-            plt.savefig(filename)
+            filename = f"prop_sector_q{q}.png"
+            plt.savefig(results_path / filename)
 
         # Show the figure
         plt.tight_layout()
@@ -159,7 +160,7 @@ def analyze_sector_proportions(values, sp500_companies, results_model_1, results
 
 
 
-def plot_objective_values(q_values, results_model_1, results_model_2, results_model_3, results_model_4, save_figures):
+def plot_objective_values(q_values, results_model_1, results_model_2, results_model_3, results_model_4, save_figures, results_path):
     """
     Function to create and save plots comparing the objective values of the models as a function of q.
     
@@ -167,6 +168,7 @@ def plot_objective_values(q_values, results_model_1, results_model_2, results_mo
         - q_values (list): List of q values.
         - results_model_1, results_model_2, results_model_3, results_model_4 (dict): Results from the models.
         - save_figures (bool): If True, saves the plots as image files.
+        - results_path: Path to save the figure
     """
 
     # Combined plot for all models
@@ -184,7 +186,7 @@ def plot_objective_values(q_values, results_model_1, results_model_2, results_mo
     plt.grid(True)
 
     if save_figures:
-        plt.savefig("ObjValue_q_4.png")
+        plt.savefig(results_path / "ObjValue_q.png")
 
     plt.show()
 
@@ -209,13 +211,13 @@ def plot_objective_values(q_values, results_model_1, results_model_2, results_mo
     plt.tight_layout(rect=[0, 0, 1, 0.96])
 
     if save_figures:
-        plt.savefig("ObjValue_q_2020_multiple_colored_4.png")
+        plt.savefig(results_path / "ObjValue_q_multiple.png")
 
     plt.show()
 
 
 
-def plot_portfolio_return_comparison(q_values, index_return_1, results_model_1, results_model_2, results_model_3, results_model_4, save_figures):
+def plot_portfolio_return_comparison(q_values, index_return_1, results_model_1, results_model_2, results_model_3, results_model_4, save_figures, results_path):
     """
     Function to display the portfolio return comparison plot as the portfolio size varies.
     
@@ -224,6 +226,7 @@ def plot_portfolio_return_comparison(q_values, index_return_1, results_model_1, 
         - index_return_1 (dictionary): Contains the returns for each stock.
         - results_model_1, results_model_2, results_model_3, results_model_4 (dict): Results from the models.
         - save_figures (bool): If True, saves the plots as image files.
+        - results_path: Path to save the figure
     """
     # Creating the plot
     fig, ax = plt.subplots(figsize=(12, 8))  
@@ -244,7 +247,7 @@ def plot_portfolio_return_comparison(q_values, index_return_1, results_model_1, 
     ax.grid(True, which='both', linestyle='--', color='grey', alpha=0.7)
 
     if save_figures:
-        fig.savefig("Portfolio_return_q_1.png")
+        fig.savefig(results_path / "Portfolio_return_q.png")
 
     plt.tight_layout()
     plt.show()  # Displays the plot
@@ -252,7 +255,7 @@ def plot_portfolio_return_comparison(q_values, index_return_1, results_model_1, 
 
 
 
-def plot_portfolio_variance_comparison(results_model_1, results_model_2, results_model_3, results_model_4, index_variance, q_values, save_figures):
+def plot_portfolio_variance_comparison(results_model_1, results_model_2, results_model_3, results_model_4, index_variance, q_values, save_figures, results_path):
     """
     Function to display the portfolio variance comparison plot.
 
@@ -261,6 +264,7 @@ def plot_portfolio_variance_comparison(results_model_1, results_model_2, results
     - q_values (list): Portfolio size values.
     - index_variance: variance of the index S&P 500.
     - save_figures (bool): Flag to save the plot.
+    - results_path: Path to save the figure
     
     """
     
@@ -284,7 +288,7 @@ def plot_portfolio_variance_comparison(results_model_1, results_model_2, results
 
     # Save the figure if requested
     if save_figures:
-        fig.savefig("Portfolio_variance_q_1.png")
+        fig.savefig(results_path / "Portfolio_variance_q.png")
         print("Plot saved as Portfolio_variance_q_1.png")
 
     plt.tight_layout()
@@ -293,7 +297,7 @@ def plot_portfolio_variance_comparison(results_model_1, results_model_2, results
 
 
 
-def plot_sharpe_ratios_comparison(results_model_1, results_model_2, results_model_3, results_model_4, SR_index, q_values, save_figures):
+def plot_sharpe_ratios_comparison(results_model_1, results_model_2, results_model_3, results_model_4, SR_index, q_values, save_figures, results_path):
     """
     Function to display the portfolio Sharpe ratio comparison plot.
 
@@ -302,6 +306,7 @@ def plot_sharpe_ratios_comparison(results_model_1, results_model_2, results_mode
     - SR_index: Sharpe ratio of the S&P 500 index.
     - q_values (list): Portfolio size values.
     - save_figures (bool): Flag to save the plot.
+    - results_path: Path to save the figure
     
     """
     results_models = [results_model_1, results_model_2, results_model_3, results_model_4]
@@ -325,8 +330,8 @@ def plot_sharpe_ratios_comparison(results_model_1, results_model_2, results_mode
 
     # Save the figure if requested
     if save_figures:
-        fig.savefig("Portfolio_variance_q_1.png")
-        print("Plot saved as Portfolio_variance_q_1.png")
+        fig.savefig(results_path / "Portfolio_sharpe_ratios_q.png")
+        print("Plot saved as Portfolio_sharpe_ratios_q.png")
 
     plt.tight_layout()
     plt.show()  # Displays the plot
@@ -334,7 +339,7 @@ def plot_sharpe_ratios_comparison(results_model_1, results_model_2, results_mode
 
 
 
-def figures_merge(fig1, fig2, save_figure, file_name="merged_figure.png"):
+def figures_merge(fig1, fig2, save_figure, results_path, file_name):
     """
     Converts two Matplotlib figures into PIL images, merges them side by side, and optionally saves the result.
     
@@ -342,6 +347,7 @@ def figures_merge(fig1, fig2, save_figure, file_name="merged_figure.png"):
     - fig1, fig2: The Matplotlib figures to merge.
     - save_figure (bool): If True, saves the final figure (default: False).
     - file_name (str): The file name to save the figure (default: "merged_figure.png").
+    - results_path: Path to save the figure
     
     Output:
     - The final merged figure as a PIL image.
@@ -369,20 +375,21 @@ def figures_merge(fig1, fig2, save_figure, file_name="merged_figure.png"):
     
     # Save the figure if requested
     if save_figure:
-        final_figure.save(file_name)
+        final_figure.save(results_path / file_name)
         print(f"Figure saved as {file_name}")
 
     return final_figure
 
 
 
-def plot_tracking_ratio(tracking_ratio_model_1, tracking_ratio_model_2, tracking_ratio_model_3, tracking_ratio_model_4, q_values, save_figures):
+def plot_tracking_ratio(tracking_ratio_model_1, tracking_ratio_model_2, tracking_ratio_model_3, tracking_ratio_model_4, q_values, save_figures, results_path):
     """
     Plot the tracking ratio for different models as a function of portfolio size q.
     
     Input:
         - tracking_ratio_model_1, tracking_ratio_model_2, tracking_ratio_model_3, tracking_ratio_model_4: Tracking ratio values for models for different values of q
         - q_values (list): Portfolio size values.
+        - results_path: Path to save the figure
     
     """
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -405,20 +412,21 @@ def plot_tracking_ratio(tracking_ratio_model_1, tracking_ratio_model_2, tracking
     
     # Save the figure if requested
     if save_figures:
-        fig.savefig("Tracking Ratios.png")
-        print("Plot saved as Tracking Ratios.png")
+        fig.savefig(results_path / "Tracking_Ratios.png")
+        print("Plot saved as Tracking_Ratios.png")
     
     plt.tight_layout()
     plt.show()
 
 
-def plot_tracking_error(tracking_error_model_1, tracking_error_model_2, tracking_error_model_3, tracking_error_model_4, q_values, save_figures):
+def plot_tracking_error(tracking_error_model_1, tracking_error_model_2, tracking_error_model_3, tracking_error_model_4, q_values, save_figures, results_path):
     """
     Plot the tracking error for different models as a function of portfolio size q.
     
     Input:
         - tracking_error_model_1, tracking_error_model_2, tracking_error_model_3, tracking_error_model_4: Tracking error values for models for different values of q
         - q_values (list): Portfolio size values.
+        - results_path: Path to save the figure
     
     """
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -440,15 +448,15 @@ def plot_tracking_error(tracking_error_model_1, tracking_error_model_2, tracking
     
     # Save the figure if requested
     if save_figures:
-        fig.savefig("Tracking Error.png")
-        print("Plot saved as Tracking Error.png")
+        fig.savefig(results_path / "Tracking_Error.png")
+        print("Plot saved as Tracking_Error.png")
     
     plt.tight_layout()
     plt.show()
 
 
 
-def plot_portfolio_return_rolling_windows(intervals, index_return_var, q_values_roll, results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll, save_figures):
+def plot_portfolio_return_rolling_windows(intervals, index_return_var, q_values_roll, results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll, save_figures, results_path):
     """
     Function to display the portfolio return plot over different time periods plot with out-of-samples data.
     
@@ -458,6 +466,7 @@ def plot_portfolio_return_rolling_windows(intervals, index_return_var, q_values_
         - q_values_roll (list): List of q values for rolling windows test.
         - results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll (dict): Results from the models.
         - save_figures (bool): If True, saves the plots as image files.
+        - results_path: Path to save the figure
     """
     for q in q_values_roll:
         # Plot portfolio return with differetn q values
@@ -476,15 +485,15 @@ def plot_portfolio_return_rolling_windows(intervals, index_return_var, q_values_
         ax.grid(True, which='both', linestyle='--', color='grey', alpha=0.7)
         
         if save_figures:
-            fig.savefig("Ex Post Portfolio Return.png")
-            print("Ex Post Portfolio Return.png")
+            fig.savefig(results_path / "Ex_Post_Portfolio_Return.png")
+            print("Ex_Post_Portfolio_Return.png")
             
         plt.tight_layout()
         plt.show()
 
     
 
-def plot_portfolio_variance_rolling_windows(intervals, index_return_var, q_values_roll, results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll, save_figures):
+def plot_portfolio_variance_rolling_windows(intervals, index_return_var, q_values_roll, results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll, save_figures, results_path):
     """
     Function to display the portfolio variance plot over different time periods plot with out-of-samples data.
     
@@ -494,6 +503,7 @@ def plot_portfolio_variance_rolling_windows(intervals, index_return_var, q_value
         - q_values_roll (list): List of q values for rolling windows test.
         - results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll (dict): Results from the models.
         - save_figures (bool): If True, saves the plots as image files.
+        - results_path: Path to save the figure
     """
     for q in q_values_roll:
         # Plot portfolio return with differetn q values
@@ -512,15 +522,15 @@ def plot_portfolio_variance_rolling_windows(intervals, index_return_var, q_value
         ax.grid(True, which='both', linestyle='--', color='grey', alpha=0.7)
         
         if save_figures:
-            fig.savefig("Ex Post Portfolio Variance.png")
-            print("Ex Post Portfolio Variance.png")
+            fig.savefig(results_path / "Ex_Post_Portfolio_Variance.png")
+            print("Ex_Post_Portfolio_Variance.png")
             
         plt.tight_layout()
         plt.show()
 
     
 
-def plot_portfolio_sharpe_ratios_rolling_windows(intervals, index_return_var, q_values_roll, results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll, save_figures):
+def plot_portfolio_sharpe_ratios_rolling_windows(intervals, index_return_var, q_values_roll, results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll, save_figures, results_path):
     """
     Function to display the portfolio sharpe ratios plot over different time periods plot with out-of-samples data.
     
@@ -530,6 +540,7 @@ def plot_portfolio_sharpe_ratios_rolling_windows(intervals, index_return_var, q_
         - q_values_roll (list): List of q values for rolling windows test.
         - results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll (dict): Results from the models.
         - save_figures (bool): If True, saves the plots as image files.
+        - results_path: Path to save the figure
     """
     for q in q_values_roll:
         # Plot portfolio return with differetn q values
@@ -548,15 +559,15 @@ def plot_portfolio_sharpe_ratios_rolling_windows(intervals, index_return_var, q_
         ax.grid(True, which='both', linestyle='--', color='grey', alpha=0.7)
         
         if save_figures:
-            fig.savefig("Ex Post Portfolio sharpe ratios.png")
-            print("Ex Post Portfolio sharpe ratios.png")
+            fig.savefig(results_path / "Ex_Post_Portfolio_sharpe_ratios.png")
+            print("Ex_Post_Portfolio_sharpe_ratios.png")
             
         plt.tight_layout()
         plt.show()
 
 
 
-def plot_tracking_ratio_roll_out(q_values_roll, intervals_out, tracking_ratio_dict_1, tracking_ratio_dict_2, tracking_ratio_dict_3, tracking_ratio_dict_4, save_figures):
+def plot_tracking_ratio_roll_out(q_values_roll, intervals_out, tracking_ratio_dict_1, tracking_ratio_dict_2, tracking_ratio_dict_3, tracking_ratio_dict_4, save_figures, results_path):
     """
     Plot the tracking ratios for dynamic test on out-of-samples data for different q values
     """
@@ -584,15 +595,15 @@ def plot_tracking_ratio_roll_out(q_values_roll, intervals_out, tracking_ratio_di
         ax.grid(True, which='both', linestyle='--', color='grey', alpha=0.7)
         
         if save_figures:
-            fig.savefig("Tracking Ratios Roll out.png")
-            print("Plot saved as Tracking Ratios.png")
+            fig.savefig(results_path / "Tracking_Ratios_Roll_out.png")
+            print("Plot saved as Tracking_Ratios_Roll_out.png")
         # Tight layout and show plot
         plt.tight_layout()
         plt.show()
         
 
     
-def plot_tracking_error_roll_out(q_values_roll, intervals_out, tracking_error_dict_1, tracking_error_dict_2, tracking_error_dict_3, tracking_error_dict_4, save_figures):
+def plot_tracking_error_roll_out(q_values_roll, intervals_out, tracking_error_dict_1, tracking_error_dict_2, tracking_error_dict_3, tracking_error_dict_4, save_figures, results_path):
     """
     Plot the tracking error for dynamic test on out-of-samples data for different q values
     """
@@ -619,8 +630,8 @@ def plot_tracking_error_roll_out(q_values_roll, intervals_out, tracking_error_di
         ax.grid(True, which='both', linestyle='--', color='grey', alpha=0.7)
         
         if save_figures:
-            fig.savefig("Tracking Error Roll out.png")
-            print("Plot saved as Tracking Error.png")
+            fig.savefig(results_path / "Tracking_Error_Roll_out.png")
+            print("Plot saved as Tracking_Error_Roll_Out.png")
         # Tight layout and show plot
         plt.tight_layout()
         plt.show()

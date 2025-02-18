@@ -2,6 +2,8 @@ from .tracking_portfolio_models import basic_cluster_tracking
 from .tracking_portfolio_models import transaction_cost_tracking
 from .tracking_portfolio_models import sector_constrained_tracking
 from .tracking_portfolio_models import full_constrained_tracking
+from .utility_functions import import_data
+from .utility_functions import data_preprocessing
 from .utility_functions import filter_by_date_range
 from .utility_functions import create_new_data_structure
 from .utility_functions import calculate_average_market_caps

@@ -3,9 +3,114 @@ import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
 import io
+from pathlib import Path
+import pickle
 from PIL import Image
 from itertools import islice
 from .tracking_portfolio_models import basic_cluster_tracking, transaction_cost_tracking, sector_constrained_tracking, full_constrained_tracking
+
+
+
+def import_data(data_path):
+    """
+    Function to import data
+    """
+    
+    # Retrieve the CURRENT companies that make up the S&P 500 index from the file sp500_companies.csv
+    sp500_companies = pd.read_csv(data_path / 'sp500_companies.csv')
+
+    # Select only the company symbols
+    tickers = sp500_companies['Symbol'].tolist()
+
+    # Retrieve the historical data for each component (start_date = "2019-01-01" - end_date = "2024-12-31") by reading from the file data_stocks.pkl (pickle format)
+    try:
+        with open(data_path / 'data_stocks_filtered.pkl', 'rb') as file:
+            data_stocks = pickle.load(file)
+        print("Data loaded successfully.")
+    except FileNotFoundError:
+        print("The pickle file was not found.")
+    except pickle.UnpicklingError:
+        print("Error during pickle file loading.")
+
+    # Import the historical market caps from the file market_caps_df_2020
+    market_caps_df_2020 = pd.read_csv(data_path / 'market_caps_df_2020.csv')
+    market_caps_df_2020 = market_caps_df_2020.set_index('Index')
+
+    # Import the historical market caps from the file market_caps_df_2021
+    market_caps_df_2021 = pd.read_csv(data_path / 'market_caps_df_2021.csv')
+    market_caps_df_2021 = market_caps_df_2021.set_index('Index')
+
+    # Import market caps for each interval
+    with open(data_path / 'market_caps_dict.pkl', 'rb') as f:
+        market_caps_dict = pickle.load(f)
+
+    # Import the 4 models on out-of-samples dynamic test (results models for different interval with 3 months steps)
+    with open(data_path / 'results_model_1_roll.pkl', 'rb') as f:
+        results_model_1_roll = pickle.load(f)
+
+    with open(data_path / 'results_model_2_roll.pkl', 'rb') as f:
+        results_model_2_roll = pickle.load(f)
+
+    with open(data_path / 'results_model_3_roll.pkl', 'rb') as f:
+        results_model_3_roll = pickle.load(f)
+
+    with open(data_path / 'results_model_4_roll.pkl', 'rb') as f:
+        results_model_4_roll = pickle.load(f)
+
+    return sp500_companies, tickers, data_stocks, market_caps_df_2020, market_caps_df_2021, market_caps_dict, results_model_1_roll, results_model_2_roll, results_model_3_roll, results_model_4_roll
+
+
+
+def data_preprocessing(sp500_companies, tickers, data_stocks):
+    """
+    Function to preprocess input data
+    """
+    
+    # --- PREPROCESSING HISTORICAL STOCKS DATA ---
+
+    # In data_stocks, select the earliest date for each stock since we want to focus only on 2020 data.
+    # Remove all stocks with an earliest date > 31/12/2019, so those that entered the index from 2020 onwards.
+
+    # Dictionary to store the earliest date for each stock
+    oldest_dates = {}
+
+    # Loop over each stock and its associated DataFrame
+    for title, df in data_stocks.items():
+        # Check if the DataFrame is not empty
+        if not df.empty:
+            df = df.reset_index()
+            df['Date'] = pd.to_datetime(df['Date']) 
+            # Ensure the first column is in datetime format
+            df['Date'] = pd.to_datetime(df['Date'])
+
+            # Find the earliest date
+            oldest_date = df['Date'].min()
+            
+            # Add to the dictionary
+            oldest_dates[title] = oldest_date
+        else:
+            # Handle the case where the DataFrame is empty
+            oldest_dates[title] = None
+
+    # Reference date
+    reference_date = pd.Timestamp("2019-12-31 00:00:00-00:00")
+
+    # Filter stocks with earliest date > 31 December 2019
+    filtered_titles = [
+        title for title, date in oldest_dates.items() 
+        if pd.to_datetime(date) > reference_date
+    ]
+
+    # Remove the stocks from the data_stocks dictionary
+    data_stocks = {key: value for key, value in data_stocks.items() if key not in filtered_titles}
+
+    # Remove the stocks from the DataFrame
+    sp500_companies = sp500_companies[~sp500_companies["Symbol"].isin(filtered_titles)]
+
+    # Remove the stocks from the tickers list
+    tickers = [ticker for ticker in tickers if ticker not in filtered_titles]
+
+    return sp500_companies, tickers, data_stocks
 
 
 
@@ -164,13 +269,10 @@ def process_sector_analysis(sp500_companies, correlation_matrix_1, market_caps_d
     
     # Gets unique sectors and sorts them
     unique_sectors_sorted = sorted(sp500_companies['Sector'].unique())
-    print("Sorted unique sectors:", unique_sectors_sorted)
-
+    
     # Counts how many companies belong to each sector
     sector_counts = sp500_companies['Sector'].value_counts()
-    print("\nNumber of companies per sector:")
-    print(sector_counts)
-
+    
     # Gets the counts (number of companies per sector) as an array
     sector_counts_values = sector_counts.values
 
@@ -195,9 +297,6 @@ def process_sector_analysis(sp500_companies, correlation_matrix_1, market_caps_d
         # Stores the matrix in the dictionary
         sector_correlation_matrices[sector_name] = sector_correlation_matrix
 
-        # Prints the correlation matrix for the sector
-        print(f'Correlation matrix for sector {sector_name}:\n', sector_correlation_matrix)
-        print("\n" + "-" * 50)
 
     # Adds market capitalizations to each DataFrame in "sector_companies_dict"
     # associated with each company
@@ -206,10 +305,21 @@ def process_sector_analysis(sp500_companies, correlation_matrix_1, market_caps_d
     symbol_to_market_cap = market_caps_df_1['Market Cap'].to_dict()
 
     # Iterates over all sectors in the dictionary
+    #for sector_name, companies_in_sector in sector_companies_dict.items():
+        # Adds the 'Market Cap' column to the DataFrame for each symbol
+     #   companies_in_sector['Market Cap'] = companies_in_sector['Symbol'].map(symbol_to_market_cap)
+        
+        # Updates the DataFrame in the dictionary
+      #  sector_companies_dict[sector_name] = companies_in_sector
+        
+    # Iterates over all sectors in the dictionary
     for sector_name, companies_in_sector in sector_companies_dict.items():
+        # Create an independent copy of each DataFrame
+        companies_in_sector = companies_in_sector.copy()
+    
         # Adds the 'Market Cap' column to the DataFrame for each symbol
         companies_in_sector['Market Cap'] = companies_in_sector['Symbol'].map(symbol_to_market_cap)
-
+    
         # Updates the DataFrame in the dictionary
         sector_companies_dict[sector_name] = companies_in_sector
 
@@ -298,8 +408,6 @@ def calculate_portfolio_return(results_model_1, results_model_2, results_model_3
             else:
                 print(f"Stock: {title}, the 'Mean Return' column does not exist!")
 
-        print("Dictionary of mean returns per stock:")
-        print(index_mean_returns_1)
         df_result['Mean Return'] = df_result['Stock'].map(index_mean_returns_1)
         results_model_1[q][1] = df_result
 
@@ -412,7 +520,6 @@ def calculate_portfolio_variance(covariance_matrix_1, w0_1, results_model_1, res
     cov_submatrix_index = covariance_matrix_1.loc[tickers_index, tickers_index]
     index_variance = np.dot(weights_index, np.dot(cov_submatrix_index, weights_index))
 
-    print(f"Portfolio index variance: {index_variance}")
 
     # Update models 1 and 2 with portfolio variance
     for model in results_models[:2]:  # Models 1 and 2
@@ -423,7 +530,6 @@ def calculate_portfolio_variance(covariance_matrix_1, w0_1, results_model_1, res
             cov_submatrix_ptf = covariance_matrix_1.loc[tickers_ptf, tickers_ptf]
             ptf_var = np.dot(weights_ptf, np.dot(cov_submatrix_ptf, weights_ptf))
             result.append(ptf_var)
-            print(f"Model 1/2, q={q}, portfolio variance: {ptf_var}")
 
     # Update models 3 and 4 with portfolio variance
     for model in results_models[2:]:  # Models 3 and 4
@@ -434,7 +540,6 @@ def calculate_portfolio_variance(covariance_matrix_1, w0_1, results_model_1, res
             cov_submatrix_ptf = covariance_matrix_1.loc[tickers_ptf, tickers_ptf]
             ptf_var = np.dot(weights_ptf, np.dot(cov_submatrix_ptf, weights_ptf))
             result.append(ptf_var)
-            print(f"Model 3/4, q={q}, portfolio variance: {ptf_var}")
 
     return results_model_1, results_model_2, results_model_3, results_model_4, index_variance
 
