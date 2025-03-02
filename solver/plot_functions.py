@@ -619,7 +619,7 @@ def plot_tracking_error_roll_out(q_values_roll, intervals_out, tracking_error_di
         # Add labels and title
         ax.set_xlabel('Intervals')
         ax.set_ylabel('Portfolio Tracking Error')
-        ax.set_title(f"Comparison of Portfolio Tracking Ratios with Intervals q={q}")
+        ax.set_title(f"Comparison of Portfolio Tracking Error with Intervals q={q}")
         
         # Correcting the x-axis tick labels
         ax.set_xticks([interval[1] for interval in intervals_out])
